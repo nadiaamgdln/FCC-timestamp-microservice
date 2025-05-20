@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
-
 const cors = require('cors');
-app.use(cors({ optionsSuccessStatus: 200 }));  // some legacy browsers choke on 204
 
+// Enable CORS
+app.use(cors({ optionsSuccessStatus: 200 }));
+
+// Serve static files
 app.use(express.static('public'));
 
 // Root route
@@ -16,12 +18,12 @@ app.get("/api/easteregg", function(req, res) {
   res.json({ greeting: "Oh, you've found this! Well, congrats! :p" });
 });
 
-// Timestamp API
+// Timestamp API route (optional parameter)
 app.get("/api/:date?", function(req, res) {
-  let { date } = req.params;
+  let dateParam = req.params.date;
 
-  // Jika parameter tidak diberikan, kirim waktu saat ini
-  if (!date) {
+  // If no date parameter, use current time
+  if (!dateParam) {
     const now = new Date();
     return res.json({
       unix: now.getTime(),
@@ -29,30 +31,29 @@ app.get("/api/:date?", function(req, res) {
     });
   }
 
-  // Jika parameter berupa unix timestamp (angka panjang), parse jadi integer
-  if (/^\d{5,}$/.test(date)) {
-    date = parseInt(date);
+  // If dateParam is numeric (timestamp)
+  if (/^\d{5,}$/.test(dateParam)) {
+    dateParam = parseInt(dateParam);
   }
 
-  const parsedDate = new Date(date);
+  const date = new Date(dateParam);
 
-  // Cek validitas
-  if (parsedDate.toString() === "Invalid Date") {
+  if (date.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
 
   res.json({
-    unix: parsedDate.getTime(),
-    utc: parsedDate.toUTCString()
+    unix: date.getTime(),
+    utc: date.toUTCString()
   });
 });
 
-// 404 fallback
+// 404 route fallback
 app.use(function(req, res) {
   res.status(404).sendFile(`${__dirname}/views/404.html`);
 });
 
-// Listen on the assigned port
+// Start the server
 const listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
