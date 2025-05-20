@@ -18,26 +18,27 @@ app.get("/api/easteregg", function(req, res) {
   res.json({ greeting: "Oh, you've found this! Well, congrats! :p" });
 });
 
-// Timestamp API route (optional parameter)
-app.get("/api/:date?", function(req, res) {
+// Untuk kasus "/api" tanpa parameter
+app.get("/api", function(req, res) {
+  const now = new Date();
+  res.json({
+    unix: now.getTime(),
+    utc: now.toUTCString()
+  });
+});
+
+// Untuk "/api/:date"
+app.get("/api/:date", function(req, res) {
   let dateParam = req.params.date;
 
-  // If no date parameter, use current time
-  if (!dateParam) {
-    const now = new Date();
-    return res.json({
-      unix: now.getTime(),
-      utc: now.toUTCString()
-    });
-  }
-
-  // If dateParam is numeric (timestamp)
+  // Jika parameter berupa angka panjang, parse jadi integer
   if (/^\d{5,}$/.test(dateParam)) {
     dateParam = parseInt(dateParam);
   }
 
   const date = new Date(dateParam);
 
+  // Cek validitas tanggal
   if (date.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
