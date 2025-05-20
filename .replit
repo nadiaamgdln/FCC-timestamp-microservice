@@ -7,3 +7,11 @@ run = ["sh", "-c", "npm run start"]
 
 [nix]
 channel = "stable-24_05"
+
+[[ports]]
+localPort = 35175
+externalPort = 80
+
+[[ports]]
+localPort = 44089
+externalPort = 3000
